@@ -33,7 +33,7 @@ export const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
 
   return (
     <div className={`
-      fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900
+      fixed inset-0 z-50  from-slate-900 via-purple-900 to-slate-900
       flex items-center justify-center transition-all duration-1000 ease-out
       ${isExiting ? 'opacity-0 scale-110' : 'opacity-100 scale-100'}
     `}>
@@ -41,7 +41,7 @@ export const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
         text-center transition-all duration-1000 ease-out transform
         ${isVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-75 translate-y-8'}
       `}>
-        <h1 className="text-6xl md:text-8xl font-bold text-white mb-4 tracking-wider">
+        <h1 className="text-6xl md:text-8xl font-bold  mb-4 tracking-wider">
           <span className={`
             inline-block transition-all duration-700 ease-out transform
             ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}

@@ -1,69 +1,27 @@
-# React + TypeScript + Vite
+# React + TypeScript + Vite Image Gallery
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a simple image gallery built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **src/App.tsx**: This is the root component of the application. It uses React's `useState` to manage which view is currently displayed: the welcome screen or the gallery. Initially, the welcome screen is shown. When the user completes the welcome interaction, a callback updates the state, causing the gallery to be rendered instead. The component conditionally renders either the `WellCome` or `Gallery` component based on this state.
 
-## Expanding the ESLint configuration
+- **src/components/WellCome.tsx**: This component is responsible for displaying a welcome message or introduction to the user. It receives an `onComplete` prop, which is a function called when the welcome process is finished (for example, after a button click or animation). This triggers the transition from the welcome screen to the gallery view in `App.tsx`.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **src/components/Gallery.tsx**: This component displays the image gallery. It receives an `isVisible` prop from `App.tsx` to determine whether it should be shown. The gallery likely manages a collection of images and renders them, possibly using the `ImageItem` component for each image.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **src/components/ImageItem.tsx**: This component is intended to render individual images within the gallery. It probably receives image data as props (such as the image URL and description) and displays them in a consistent format. This helps keep the gallery
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## How It Works
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- The app starts with a welcome screen (`WellCome` component).
+- After the welcome is completed, the gallery (`Gallery` component) is shown.
+- The gallery displays images, possibly using the `ImageItem` component.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Getting Started
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. Install dependencies:  
+   `npm install`
+2. Start development server:  
+   `npm run
