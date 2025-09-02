@@ -20,6 +20,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   isAnimating 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <div
@@ -33,6 +34,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         height: `${size}px`,
         transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isAnimating ? 'scale(0) ' : 'scale(1) rotate(0deg)'}`,
         transitionDelay: isAnimating ? `${delay}ms` : '0ms',
+        opacity: isLoaded ? 1 : 0,
         zIndex: isHovered ? 10 : 1,
       }}
       onMouseEnter={() => setIsHovered(true)}

@@ -50,10 +50,9 @@ const getGridPositions = (size: number) => {
 
 interface GalleryProps {
   isVisible: boolean;
-  showWelcome: boolean;
 }
 
-export const Gallery: React.FC<GalleryProps> = ({ isVisible, showWelcome }) => {
+export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
   const [zoom, setZoom] = useState(1);
@@ -61,7 +60,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible, showWelcome }) => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [animatedImages, setAnimatedImages] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeVisible, setWelcomeVisible] = useState(false);
+  const [textScale, setTextScale] = useState(1);
+  const textPanX = panX * 0.5; // Parallax effect
+  const textPanY = panY * 0.5;
   
   const containerRef = useRef<HTMLDivElement>(null);
   const imageSize = 200;
@@ -69,23 +71,27 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible, showWelcome }) => {
 
   // Start image animation when gallery becomes visible
   useEffect(() => {
-    // Start welcome animation immediately
-    setTimeout(() => setShowWelcome(true), 500);
-    
-    // Start image animations after welcome is partially complete
     if (isVisible) {
-      const interval = setInterval(() => {
-        setAnimatedImages(prev => {
-          if (prev >= images.length) {
-            clearInterval(interval);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 150);
+      // Start welcome animation immediately
+      setTimeout(() => setWelcomeVisible(true), 500);
       
-      return () => clearInterval(interval);
-    }, 2500); // Start after welcome animation
+      // Start image animations after welcome is partially complete
+      const animationTimer = setTimeout(() => {
+        const interval = setInterval(() => {
+          setAnimatedImages(prev => {
+            if (prev >= images.length) {
+              clearInterval(interval);
+              return prev;
+            }
+            return prev + 1;
+          });
+        }, 150);
+        
+        return () => clearInterval(interval);
+      }, 2500); // Start after welcome animation
+      
+      return () => clearTimeout(animationTimer);
+    }
   }, [isVisible]);
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -165,10 +171,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible, showWelcome }) => {
       onWheel={handleWheel}
     >
       {/* Welcome text in background */}
-      {showWelcome && (
+      {welcomeVisible && (
         <h1 
           className={`text-8xl md:text-9xl font-bold text-black/30 tracking-wider select-none transition-all duration-2000 ease-out ${
-            showWelcome ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
+            welcomeVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
           }`}
           style={{ 
             transform: `translate(${textPanX}px, ${textPanY}px) scale(${textScale})`
@@ -176,24 +182,31 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible, showWelcome }) => {
         >
           Welcome
         </h1>
-          {images.map((src, index) => {
-            const position = positions[index] || { x: 0, y: 0 };
-            const shouldAnimate = index < animatedImages;
-            
-            return (
-              <ImageItem
-                key={index}
-                src={src}
-                alt={`Image ${index + 1}`}
-                x={position.x}
-                y={position.y}
-                size={imageSize}
-                delay={index * 100}
-                isAnimating={!shouldAnimate}
-              />
-            );
-          })}
-        </div>
+      )}
+      
+      {/* Image grid */}
+      <div className="relative w-full h-full"
+        style={{
+          transform: `translate(${panX}px, ${panY}px) scale(${zoom})`
+        }}
+      >
+        {images.map((src, index) => {
+          const position = positions[index] || { x: 0, y: 0 };
+          const shouldAnimate = index < animatedImages;
+          
+          return (
+            <ImageItem
+              key={index}
+              src={src}
+              alt={`Image ${index + 1}`}
+              x={position.x}
+              y={position.y}
+              size={imageSize}
+              delay={index * 100}
+              isAnimating={!shouldAnimate}
+            />
+          );
+        })}
       </div>
     </div>
   );
