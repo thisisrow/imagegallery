@@ -30,11 +30,14 @@ const images = [
   
 ];
 
-// Function to calculate positions for masonry layout
+// Function to calculate positions for masonry layout with alternating offsets
 const getColumnPositions = (baseSize: number, count: number, numCols: number = 4) => {
   const positions = [];
   const columnHeights = new Array(numCols).fill(0);
+  const columnLastOffset = new Array(numCols).fill(0); // Track last offset for each column
   const horizontalSpacing = baseSize * 1.1;
+  const offsetAmount = baseSize * 0.3; // Amount to offset odd/even images
+  const verticalGap = baseSize * 0.3; // Minimum vertical gap between images
   
   for (let i = 0; i < count; i++) {
     // Generate a random height variation for each image
@@ -45,7 +48,14 @@ const getColumnPositions = (baseSize: number, count: number, numCols: number = 4
     const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
     
     const x = (shortestColumnIndex - Math.floor(numCols / 2)) * horizontalSpacing;
-    const y = columnHeights[shortestColumnIndex];
+    
+    // Calculate offset based on column's last image
+    const isEven = Math.floor(columnHeights[shortestColumnIndex] / (baseSize + verticalGap)) % 2 === 0;
+    const offsetY = isEven ? offsetAmount : -offsetAmount;
+    
+    // Ensure minimum gap from previous image in the same column
+    const minY = columnHeights[shortestColumnIndex] + verticalGap;
+    const y = Math.max(minY, columnHeights[shortestColumnIndex] + offsetY);
     
     positions.push({ 
       x, 
@@ -54,8 +64,9 @@ const getColumnPositions = (baseSize: number, count: number, numCols: number = 4
       width: baseSize
     });
     
-    // Update the height of the column
-    columnHeights[shortestColumnIndex] += itemHeight + (baseSize * 0.2); // Add some vertical spacing
+    // Update the column height considering the actual position and height
+    columnHeights[shortestColumnIndex] = y + itemHeight;
+    columnLastOffset[shortestColumnIndex] = offsetY;
   }
   return positions;
 };
