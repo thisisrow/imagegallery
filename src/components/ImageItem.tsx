@@ -19,21 +19,19 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   delay,
   isAnimating 
 }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
       className={`
         absolute transition-all duration-1000 ease-out transform
-        ${isAnimating ? 'scale-0 opacity-0 ' : 'scale-100 opacity-100 '}
       `}
       style={{
         left: `calc(50% + ${isAnimating ? 0 : x}px)`,
         top: `calc(50% + ${isAnimating ? 0 : y}px)`,
         width: `${size}px`,
         height: `${size}px`,
-        transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.1)' : 'scale(1)'} ${isAnimating ? 'scale(0)' : 'scale(1) '}`,
+        transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isAnimating ? 'scale(0) ' : 'scale(1) rotate(0deg)'}`,
         transitionDelay: isAnimating ? `${delay}ms` : '0ms',
         zIndex: isHovered ? 10 : 1,
       }}
@@ -41,10 +39,9 @@ export const ImageItem: React.FC<ImageItemProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={`
-        w-full h-full rounded-xl overflow-hidden shadow-2xl transition-all duration-300
+        w-full h-full rounded-xl overflow-hidden shadow-2xl transition-all duration-300 backdrop-blur-sm
         ${isHovered ? 'shadow-purple-500/30 shadow-3xl' : 'shadow-xl'}
-        ${isLoaded ? 'opacity-100' : 'opacity-0'}
-        ring-2 ring-white/10
+        ring-1 ring-white/20 bg-white/5
       `}>
         <img
           src={src}
@@ -62,9 +59,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         
         {/* Subtle overlay for depth */}
         <div className={`
-          absolute inset-0 bg-gradient-to-t from-black/20 to-transparent
-          transition-opacity duration-300
-          ${isHovered ? 'opacity-0' : 'opacity-100'}
+          absolute inset-0 bg-gradient-to-t from-black/10 to-transparent
         `} />
       </div>
     </div>
