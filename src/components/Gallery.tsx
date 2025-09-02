@@ -30,24 +30,32 @@ const images = [
   
 ];
 
-// New function to calculate positions in a column-based layout
-const getColumnPositions = (imageSize: number, count: number, numCols: number = 4) => {
+// Function to calculate positions for masonry layout
+const getColumnPositions = (baseSize: number, count: number, numCols: number = 4) => {
   const positions = [];
   const columnHeights = new Array(numCols).fill(0);
-  const horizontalSpacing = imageSize * 1.2;
-  const verticalSpacing = imageSize * 1.2;
-
+  const horizontalSpacing = baseSize * 1.1;
+  
   for (let i = 0; i < count; i++) {
+    // Generate a random height variation for each image
+    const heightRatio = Math.random() * 0.5 + 0.75; // Random between 0.75 and 1.25
+    const itemHeight = baseSize * heightRatio;
+    
     // Find the shortest column to place the next image
     const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
-
+    
     const x = (shortestColumnIndex - Math.floor(numCols / 2)) * horizontalSpacing;
     const y = columnHeights[shortestColumnIndex];
-
-    positions.push({ x, y });
-
-    // Update the height of the column, adding some "padding"
-    columnHeights[shortestColumnIndex] += verticalSpacing;
+    
+    positions.push({ 
+      x, 
+      y,
+      height: itemHeight,
+      width: baseSize
+    });
+    
+    // Update the height of the column
+    columnHeights[shortestColumnIndex] += itemHeight + (baseSize * 0.2); // Add some vertical spacing
   }
   return positions;
 };
@@ -73,7 +81,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [isAnimating, setIsAnimating] = useState(true);
   
   const containerRef = useRef<HTMLDivElement>(null);
-  const imageSize = 180;
 
   // Start animation when gallery becomes visible
   useEffect(() => {
@@ -178,7 +185,8 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
                 alt={`Image ${index + 1}`}
                 x={position.x}
                 y={position.y}
-                size={imageSize}
+                width={position.width}
+                height={position.height}
                 delay={index * 80}
                 isAnimating={isAnimating}
               />

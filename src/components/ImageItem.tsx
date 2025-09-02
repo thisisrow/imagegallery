@@ -5,7 +5,8 @@ interface ImageItemProps {
   alt: string;
   x: number;
   y: number;
-  size: number;
+  width: number;
+  height: number;
   delay: number;
   isAnimating: boolean;
 }
@@ -15,7 +16,8 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   alt, 
   x, 
   y, 
-  size, 
+  width,
+  height,
   delay,
   isAnimating 
 }) => {
@@ -31,8 +33,8 @@ export const ImageItem: React.FC<ImageItemProps> = ({
       style={{
         left: `calc(50% + ${isAnimating ? 0 : x}px)`,
         top: `calc(50% + ${isAnimating ? 0 : y}px)`,
-        width: `${size}px`,
-        height: `${size}px`,
+        width: `${width}px`,
+        height: `${height}px`,
         transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.1)' : 'scale(1)'} ${isAnimating ? 'scale(0)' : 'scale(1) '}`,
         transitionDelay: isAnimating ? `${delay}ms` : '0ms',
         zIndex: isHovered ? 10 : 1,
