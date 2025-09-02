@@ -22,45 +22,33 @@ const images = [
   'https://images.pexels.com/photos/1643385/pexels-photo-1643385.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
   'https://images.pexels.com/photos/1571464/pexels-photo-1571464.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
   'https://images.pexels.com/photos/2102591/pexels-photo-2102591.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+
+
+
+
+
+  
 ];
 
-// Diamond pattern positions
-const getDiamondPositions = (size: number) => {
+// New function to calculate positions in a column-based layout
+const getColumnPositions = (imageSize: number, count: number, numCols: number = 4) => {
   const positions = [];
-  const spacing = size * 1.3;
-  const centerX = 0;
-  const centerY = 0;
+  const columnHeights = new Array(numCols).fill(0);
+  const horizontalSpacing = imageSize * 1.2;
+  const verticalSpacing = imageSize * 1.2;
 
-  // Center image
-  positions.push({ x: centerX, y: centerY });
+  for (let i = 0; i < count; i++) {
+    // Find the shortest column to place the next image
+    const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
 
-  // First ring (4 images)
-  positions.push({ x: centerX, y: centerY - spacing });
-  positions.push({ x: centerX + spacing, y: centerY });
-  positions.push({ x: centerX, y: centerY + spacing });
-  positions.push({ x: centerX - spacing, y: centerY });
+    const x = (shortestColumnIndex - Math.floor(numCols / 2)) * horizontalSpacing;
+    const y = columnHeights[shortestColumnIndex];
 
-  // Second ring (8 images)
-  const ring2Distance = spacing * 2;
-  for (let i = 0; i < 8; i++) {
-    const angle = (i * Math.PI * 2) / 8;
-    positions.push({
-      x: centerX + Math.cos(angle) * ring2Distance,
-      y: centerY + Math.sin(angle) * ring2Distance,
-    });
+    positions.push({ x, y });
+
+    // Update the height of the column, adding some "padding"
+    columnHeights[shortestColumnIndex] += verticalSpacing;
   }
-
-  // Third ring (remaining images)
-  const ring3Distance = spacing * 3.2;
-  const remainingImages = Math.max(0, images.length - 13);
-  for (let i = 0; i < remainingImages; i++) {
-    const angle = (i * Math.PI * 2) / Math.max(1, remainingImages);
-    positions.push({
-      x: centerX + Math.cos(angle) * ring3Distance,
-      y: centerY + Math.sin(angle) * ring3Distance,
-    });
-  }
-
   return positions;
 };
 
@@ -69,6 +57,13 @@ interface GalleryProps {
 }
 
 export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
+  // Store the positions using useState to ensure they are fixed
+  const [positions] = useState(() => {
+    const imageSize = 200;
+    const numColumns = 5; // You can adjust the number of columns here
+    return getColumnPositions(imageSize, images.length, numColumns);
+  });
+  
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
   const [zoom, setZoom] = useState(2);
@@ -79,7 +74,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   
   const containerRef = useRef<HTMLDivElement>(null);
   const imageSize = 180;
-  const positions = getDiamondPositions(imageSize);
 
   // Start animation when gallery becomes visible
   useEffect(() => {
@@ -160,7 +154,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   return (
     <div 
       ref={containerRef}
-      className="w-full h-screen overflow-hidden  from-slate-900  to-slate-900 cursor-grab active:cursor-grabbing"
+      className="w-full h-screen overflow-hidden from-slate-900 to-slate-900 cursor-grab active:cursor-grabbing"
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
