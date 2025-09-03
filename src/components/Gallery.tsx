@@ -173,20 +173,22 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     >
       {/* Welcome text in background */}
       {welcomeVisible && (
-        <h1 
-          className={`text-8xl md:text-9xl font-bold text-black/30 tracking-wider select-none transition-all duration-2000 ease-out ${
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <h1 
+            className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all duration-2000 ease-out ${
             welcomeVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
           }`}
-          style={{ 
-            transform: `translate(${textPanX}px, ${textPanY}px) scale(${textScale})`
-          }}
-        >
-          Welcome
-        </h1>
+            style={{ 
+              transform: `translate(${textPanX}px, ${textPanY}px) scale(${textScale})`
+            }}
+          >
+            Welcome
+          </h1>
+        </div>
       )}
       
       {/* Image grid */}
-      <div className="relative w-full h-full"
+      <div className="relative w-full h-full z-10"
         style={{
           transform: `translate(${panX}px, ${panY}px) scale(${zoom})`
         }}
