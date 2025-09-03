@@ -192,8 +192,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
             className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all duration-2000 ease-out ${
             welcomeVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
           }`}
+            // Fixed text scaling: The "Welcome" text now maintains its size when you zoom in and out
+            // Only parallax movement is applied, zoom transform is excluded to keep text size constant
             style={{ 
-              transform: `translate(${textPanX}px, ${textPanY}px) scale(${textScale})`
+              transform: `translate(${textPanX}px, ${textPanY}px)`
             }}
           >
             Welcome
