@@ -61,7 +61,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [animatedImages, setAnimatedImages] = useState(0);
   const [welcomeVisible, setWelcomeVisible] = useState(false);
-  const [textScale, setTextScale] = useState(1);
   const textPanX = panX * 0.5; // Parallax effect
   const textPanY = panY * 0.5;
   
@@ -132,7 +131,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     setZoom(prev => Math.max(1.3, Math.min(3, prev * delta)));
-    setTextScale(prev => Math.max(0.5, Math.min(2, prev * (delta * 0.8))));
   };
 
   // Mouse events
