@@ -131,7 +131,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(prev => Math.max(0.8, Math.min(3, prev * delta)));
+    setZoom(prev => Math.max(1.3, Math.min(3, prev * delta)));
     setTextScale(prev => Math.max(0.5, Math.min(2, prev * (delta * 0.8))));
   };
 
