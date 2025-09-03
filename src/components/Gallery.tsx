@@ -61,7 +61,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [animatedImages, setAnimatedImages] = useState(0);
   const [welcomeVisible, setWelcomeVisible] = useState(false);
-  // const [textScale, setTextScale] = useState(1);
+  const [textScale, setTextScale] = useState(1);
   const textPanX = panX * 0.5; // Parallax effect
   const textPanY = panY * 0.5;
   
