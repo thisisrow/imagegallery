@@ -55,7 +55,7 @@ interface GalleryProps {
 export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(2);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
@@ -106,8 +106,22 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const deltaX = clientX - dragStart.x;
     const deltaY = clientY - dragStart.y;
     
-    setPanX(panStart.x + deltaX);
-    setPanY(panStart.y + deltaY);
+    // Calculate new positions
+    const newPanX = panStart.x + deltaX;
+    const newPanY = panStart.y + deltaY;
+    
+    // Define boundaries (adjust these values to control how far users can drag)
+    const maxPanX = 800;
+    const maxPanY = 600;
+    const minPanX = -800;
+    const minPanY = -600;
+    
+    // Apply boundaries
+    const boundedPanX = Math.max(minPanX, Math.min(maxPanX, newPanX));
+    const boundedPanY = Math.max(minPanY, Math.min(maxPanY, newPanY));
+    
+    setPanX(boundedPanX);
+    setPanY(boundedPanY);
   };
 
   const handleEnd = () => {
@@ -117,7 +131,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(prev => Math.max(0.3, Math.min(3, prev * delta)));
+    setZoom(prev => Math.max(0.8, Math.min(3, prev * delta)));
     setTextScale(prev => Math.max(0.5, Math.min(2, prev * (delta * 0.8))));
   };
 
@@ -190,7 +204,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       {/* Image grid */}
       <div className="relative w-full h-full z-10"
         style={{
-          transform: `translate(${panX}px, ${panY}px) scale(${zoom})`
+          transform: `translate(${panX * 1.5}px, ${panY * 1.5}px) scale(${zoom})`
         }}
       >
         {images.map((src, index) => {
