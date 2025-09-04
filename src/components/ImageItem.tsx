@@ -43,7 +43,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={`
-        w-full h-full rounded-xl overflow-hidden shadow-2xl transition-all duration-300 backdrop-blur-sm
+        w-full h-full  overflow-hidden shadow-2xl transition-all duration-300 backdrop-blur-sm
         ${isHovered ? 'shadow-purple-500/30 shadow-3xl' : 'shadow-xl'}
         ring-1 ring-white/20 bg-white/5
       `}>
