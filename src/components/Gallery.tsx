@@ -23,7 +23,6 @@ const images = [
   'https://images.pexels.com/photos/1571464/pexels-photo-1571464.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
   'https://images.pexels.com/photos/2102591/pexels-photo-2102591.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
 ];
-
 // Grid positions (unchanged)
 const getGridPositions = (size: number) => {
   const positions = [];
@@ -66,20 +65,9 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Bounds + transform constants
-  const OVERSCROLL = 100;   // 100px beyond content edges
-  const DRAG_MULT = 1.5;    // you use this in the translate
-
-  // 🔸 Inertia tuning
-  const FRICTION = 0.0025;  // velocity decay per ms (↑ = shorter glide)
-  const BOUNCE = 0.25;      // bounce amount on hitting bounds [0..1]
-  const MIN_SPEED = 0.01;   // px/ms; stop inertia under this speed
-  const VEL_SMOOTH = 0.15;  // velocity smoothing [0..1]
-
-  // Momentum refs
-  const lastPointer = useRef({ x: 0, y: 0, t: 0 });
-  const velocityRef = useRef({ x: 0, y: 0 }); // px/ms
-  const inertiaRaf = useRef<number | null>(null);
+  // 🔧 tweak here if you want a different overscroll
+  const OVERSCROLL = 100;
+  const DRAG_MULT = 1.5; // you use this in the translate
 
   const imageSize = 200;
   const positions = getGridPositions(imageSize);
@@ -101,11 +89,11 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       ro = new ResizeObserver(() => update());
       ro.observe(el);
     } else {
-      window.addEventListener('resize', update);
+      (window as Window).addEventListener('resize', update);
     }
     return () => {
       ro?.disconnect();
-      window.removeEventListener('resize', update);
+      (window as Window).removeEventListener('resize', update);
     };
   }, []);
 
@@ -170,7 +158,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom, containerSize.width, containerSize.height]);
 
-  // --- welcome + image cascade (unchanged) ---
+  // --- your existing effects (welcome + image cascade) stay as-is ---
   useEffect(() => {
     if (isVisible) {
       setTimeout(() => setWelcomeVisible(true), 500);
@@ -192,81 +180,11 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     }
   }, [isVisible]);
 
-  // ---- inertia helpers ----
-  const cancelInertia = () => {
-    if (inertiaRaf.current != null) {
-      cancelAnimationFrame(inertiaRaf.current);
-      inertiaRaf.current = null;
-    }
-  };
-
-  const startInertia = () => {
-    let prev = performance.now();
-
-    const tick = (t: number) => {
-      const dt = Math.min(50, Math.max(1, t - prev)); // cap dt and avoid 0
-      prev = t;
-
-      // current velocity (px/ms)
-      let vx = velocityRef.current.x;
-      let vy = velocityRef.current.y;
-
-      // frictional decay
-      const decay = Math.max(0, 1 - FRICTION * dt);
-      vx *= decay;
-      vy *= decay;
-
-      const { minPanX, maxPanX, minPanY, maxPanY } = getPanBounds();
-
-      // advance + soft bounce at edges
-      setPanX((x) => {
-        let nx = x + vx * dt;
-        if (nx < minPanX && vx < 0) {
-          nx = minPanX;
-          vx = -vx * BOUNCE;
-        } else if (nx > maxPanX && vx > 0) {
-          nx = maxPanX;
-          vx = -vx * BOUNCE;
-        }
-        return nx;
-      });
-
-      setPanY((y) => {
-        let ny = y + vy * dt;
-        if (ny < minPanY && vy < 0) {
-          ny = minPanY;
-          vy = -vy * BOUNCE;
-        } else if (ny > maxPanY && vy > 0) {
-          ny = maxPanY;
-          vy = -vy * BOUNCE;
-        }
-        return ny;
-      });
-
-      // store updated velocity
-      velocityRef.current.x = vx;
-      velocityRef.current.y = vy;
-
-      const speed = Math.hypot(vx, vy);
-      if (speed < MIN_SPEED) {
-        inertiaRaf.current = null;
-        return;
-      }
-
-      inertiaRaf.current = requestAnimationFrame(tick);
-    };
-
-    inertiaRaf.current = requestAnimationFrame(tick);
-  };
-
-  // --- drag handling with dynamic bounds + velocity tracking ---
+  // --- drag handling with dynamic bounds ---
   const handleStart = (clientX: number, clientY: number) => {
-    cancelInertia(); // stop any ongoing glide
     setIsDragging(true);
     setDragStart({ x: clientX, y: clientY });
     setPanStart({ x: panX, y: panY });
-    lastPointer.current = { x: clientX, y: clientY, t: performance.now() };
-    velocityRef.current = { x: 0, y: 0 };
   };
 
   const handleMove = (clientX: number, clientY: number) => {
@@ -275,34 +193,16 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const deltaX = clientX - dragStart.x;
     const deltaY = clientY - dragStart.y;
 
+    const newPanX = panStart.x + deltaX;
+    const newPanY = panStart.y + deltaY;
+
     const { minPanX, maxPanX, minPanY, maxPanY } = getPanBounds();
 
-    const newPanX = clamp(panStart.x + deltaX, minPanX, maxPanX);
-    const newPanY = clamp(panStart.y + deltaY, minPanY, maxPanY);
-
-    setPanX(newPanX);
-    setPanY(newPanY);
-
-    // velocity (px/ms), smoothed
-    const now = performance.now();
-    const dt = Math.max(1, now - lastPointer.current.t);
-    const dx = clientX - lastPointer.current.x;
-    const dy = clientY - lastPointer.current.y;
-    lastPointer.current = { x: clientX, y: clientY, t: now };
-
-    const vx = dx / dt;
-    const vy = dy / dt;
-
-    velocityRef.current.x =
-      velocityRef.current.x * (1 - VEL_SMOOTH) + vx * VEL_SMOOTH;
-    velocityRef.current.y =
-      velocityRef.current.y * (1 - VEL_SMOOTH) + vy * VEL_SMOOTH;
+    setPanX(clamp(newPanX, minPanX, maxPanX));
+    setPanY(clamp(newPanY, minPanY, maxPanY));
   };
 
-  const handleEnd = () => {
-    setIsDragging(false);
-    startInertia(); // kick off glide
-  };
+  const handleEnd = () => setIsDragging(false);
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -317,7 +217,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     });
   };
 
-  // mouse/touch handlers
+  // mouse/touch handlers (unchanged)
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     handleStart(e.clientX, e.clientY);
@@ -331,7 +231,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     handleMove(e.touches[0].clientX, e.touches[0].clientY);
   };
 
-  // global listeners for drag
   useEffect(() => {
     if (!isDragging) return;
 
@@ -344,14 +243,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isDragging, dragStart, panStart]);
-
-  // cleanup RAF on unmount
-  useEffect(() => {
-    return () => {
-      if (inertiaRaf.current != null) cancelAnimationFrame(inertiaRaf.current);
-    };
-  }, []);
+  }, [isDragging, dragStart, panStart]); // deps OK
 
   if (!isVisible) return null;
 
@@ -383,7 +275,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
         style={{
           transform: `translate(${panX * DRAG_MULT}px, ${panY * DRAG_MULT}px) scale(${zoom})`,
           transformOrigin: 'center center',
-          willChange: 'transform',
         }}
       >
         {images.map((src, index) => {
