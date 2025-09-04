@@ -31,7 +31,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         left: `calc(50% + ${isAnimating ? 0 : x}px)`,
         top: `calc(50% + ${isAnimating ? 0 : y}px)`,
         width: `${size}px`,
-        height: `auto`,
+        height: `${size}px`,
         transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isAnimating ? 'scale(0) ' : 'scale(1) rotate(0deg)'}`,
         transitionDelay: isAnimating ? `${delay}ms` : '0ms',
         opacity: isLoaded ? 1 : 0,
@@ -48,7 +48,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         <img
           src={src}
           alt={alt}
-          className="w-full h-full object-contain transition-transform duration-300"
+          className="w-full h-full object-cover transition-transform duration-300"
           style={{ 
             transform: isHovered ? 'scale(1.1)' : 'scale(1)',
             userSelect: 'none',
