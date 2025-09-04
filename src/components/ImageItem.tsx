@@ -48,7 +48,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         <img
           src={src}
           alt={alt}
-          className="w-full h-full object-cover transition-transform duration-300"
+          className="w-full h-full object-contain transition-transform duration-300"
           style={{ 
             transform: isHovered ? 'scale(1.1)' : 'scale(1)',
             userSelect: 'none',
