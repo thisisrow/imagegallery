@@ -23,13 +23,39 @@ const images = [
   '/images/1-1.jpeg',
   '/images/1-1.jpeg',
 ];
-// Grid positions with proper aspect ratio
-const getGridPositions = (width: number, height: number) => {
+// Calculate responsive columns based on container width
+const getResponsiveColumns = (containerWidth: number): number => {
+  if (containerWidth <= 768) return 3; // Mobile
+  if (containerWidth <= 1024) return 3; // Tablet
+  return 5; // Desktop
+};
+
+// Calculate responsive columns based on container width
+const getResponsiveSpace = (containerWidth: number): number => {
+  if (containerWidth <= 768) return 20; // Mobile
+  if (containerWidth <= 1024) return 30; // Tablet
+  return 30; // Desktop
+};
+
+// Calculate responsive image width
+const getResponsiveImageWidth = (containerWidth: number, cols: number): number => {
+  const minWidth = 120;
+  const maxWidth = 200;
+  const calculatedWidth = (containerWidth - (cols + 1) * 20) / cols; // Account for gaps
+  return Math.max(minWidth, Math.min(maxWidth, calculatedWidth));
+};
+
+// Grid positions with responsive layout
+const getGridPositions = (containerWidth: number) => {
+  const cols = getResponsiveColumns(containerWidth);
+  const imageWidth = getResponsiveImageWidth(containerWidth, cols);
+  const imageAspectRatio = 1060 / 1500;
+  const imageHeight = imageWidth * imageAspectRatio;
+  
   const positions = [];
-  const cols = 5;
   const rows = Math.ceil(images.length / cols);
-  const spacingX = width + 30;
-  const spacingY = height + 30;
+  const spacingX = imageWidth + getResponsiveSpace(containerWidth);
+  const spacingY = imageHeight + getResponsiveSpace(containerWidth);
 
   for (let i = 0; i < images.length; i++) {
     const row = Math.floor(i / cols);
@@ -44,7 +70,7 @@ const getGridPositions = (width: number, height: number) => {
     });
   }
 
-  return positions;
+  return { positions, imageWidth, imageHeight, cols };
 };
 
 interface GalleryProps {
@@ -66,6 +92,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [lastMoveTime, setLastMoveTime] = useState(0);
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const momentumRef = useRef<number | null>(null);
+  
+  // Touch handling for pinch-to-zoom
+  const [initialTouchDistance, setInitialTouchDistance] = useState<number | null>(null);
+  const [initialZoom, setInitialZoom] = useState(1);
 
   const textPanX = panX * 0.5; // parallax
   const textPanY = panY * 0.5;
@@ -79,15 +109,12 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const FRICTION = 0.92; // Momentum decay factor
   const MIN_VELOCITY = 0.5; // Stop momentum when velocity is below this
 
-  // Calculate proper dimensions based on image aspect ratio
-  const imageWidth = 200;
-  const imageAspectRatio = 1060 / 1500; // height / width from your image specs
-  const imageHeight = imageWidth * imageAspectRatio; // ~141px
-  
-  const positions = getGridPositions(imageWidth, imageHeight);
-
+  // Calculate responsive grid layout
   // --- container size (used to compute dynamic bounds) ---
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  // Calculate responsive grid layout based on container size
+  const { positions, imageWidth, imageHeight, cols } = getGridPositions(containerSize.width || 1200);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -113,7 +140,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   // --- helpers to compute grid size and bounds ---
   const getGridSize = () => {
-    const cols = 5;
     const rows = Math.ceil(images.length / cols);
     const spacingX = imageWidth + 10;
     const spacingY = imageHeight + 10;
@@ -213,6 +239,17 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     };
   }, [velocity, isDragging]);
 
+  // Helper function to calculate distance between two touch points
+  const getTouchDistance = (touches: React.TouchList): number => {
+    if (touches.length < 2) return 0;
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    return Math.hypot(
+      touch2.clientX - touch1.clientX,
+      touch2.clientY - touch1.clientY
+    );
+  };
+
   // --- your existing effects (welcome + image cascade) stay as-is ---
   useEffect(() => {
     if (isVisible) {
@@ -307,13 +344,61 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     e.preventDefault();
     handleStart(e.clientX, e.clientY);
   };
+  
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
-    handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    
+    if (e.touches.length === 1) {
+      // Single touch - start dragging
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2) {
+      // Two touches - start pinch-to-zoom
+      setIsDragging(false); // Stop any dragging
+      const distance = getTouchDistance(e.touches);
+      setInitialTouchDistance(distance);
+      setInitialZoom(zoom);
+      
+      // Stop momentum
+      if (momentumRef.current) {
+        cancelAnimationFrame(momentumRef.current);
+        momentumRef.current = null;
+      }
+      setVelocity({ x: 0, y: 0 });
+    }
   };
+  
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
-    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    
+    if (e.touches.length === 1 && isDragging) {
+      // Single touch - continue dragging
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2 && initialTouchDistance !== null) {
+      // Two touches - handle pinch-to-zoom
+      const currentDistance = getTouchDistance(e.touches);
+      const scale = currentDistance / initialTouchDistance;
+      const newZoom = Math.max(1.3, Math.min(3, initialZoom * scale));
+      
+      setZoom(newZoom);
+      
+      // Clamp pan to new zoom bounds
+      const { minPanX, maxPanX, minPanY, maxPanY } = getPanBounds(newZoom);
+      setPanX((x) => clamp(x, minPanX, maxPanX));
+      setPanY((y) => clamp(y, minPanY, maxPanY));
+    }
+  };
+  
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) {
+      // All touches ended
+      handleEnd();
+      setInitialTouchDistance(null);
+    } else if (e.touches.length === 1 && initialTouchDistance !== null) {
+      // Went from pinch to single touch
+      setInitialTouchDistance(null);
+      // Start dragging with remaining touch
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    }
   };
 
   useEffect(() => {
@@ -339,14 +424,14 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
-      onTouchEnd={handleEnd}
+      onTouchEnd={handleTouchEnd}
       onWheel={handleWheel}
     >
       {/* Welcome text */}
       {welcomeVisible && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <h1
-            className={`text-8xl  md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
+            className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
             style={{ transform: `translate(${textPanX}px, ${textPanY}px)` }}
           >
             Welcome
