@@ -28,8 +28,8 @@ const getGridPositions = (width: number, height: number) => {
   const positions = [];
   const cols = 5;
   const rows = Math.ceil(images.length / cols);
-  const spacingX = width + 10;
-  const spacingY = height + 10;
+  const spacingX = width + 30;
+  const spacingY = height + 30;
 
   for (let i = 0; i < images.length; i++) {
     const row = Math.floor(i / cols);
@@ -346,7 +346,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       {welcomeVisible && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <h1
-            className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
+            className={`text-8xl  md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
             style={{ transform: `translate(${textPanX}px, ${textPanY}px)` }}
           >
             Welcome
