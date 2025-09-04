@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ImageItem } from './ImageItem';
 
 const images = [
-  '/src/assets/1-1.jpeg',
-  '/src/assets/1-2.jpeg',
+  'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+  'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
   'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
   'https://images.pexels.com/photos/1109541/pexels-photo-1109541.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
   'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
@@ -59,6 +59,12 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [animatedImages, setAnimatedImages] = useState(0);
   const [welcomeVisible, setWelcomeVisible] = useState(false);
+  
+  // Momentum and velocity tracking
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
+  const [lastMoveTime, setLastMoveTime] = useState(0);
+  const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
+  const momentumRef = useRef<number | null>(null);
 
   const textPanX = panX * 0.5; // parallax
   const textPanY = panY * 0.5;
@@ -67,7 +73,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   // 🔧 tweak here if you want a different overscroll
   const OVERSCROLL = 100;
-  const DRAG_MULT = 1.5; // you use this in the translate
+  const DRAG_MULT = 1.5;
+  const DRAG_AMPLIFICATION = 2.5; // Amplify user movement during dragging
+  const FRICTION = 0.92; // Momentum decay factor
+  const MIN_VELOCITY = 0.5; // Stop momentum when velocity is below this
 
   const imageSize = 200;
   const positions = getGridPositions(imageSize);
@@ -155,8 +164,48 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const { minPanX, maxPanX, minPanY, maxPanY } = getPanBounds();
     setPanX((x) => clamp(x, minPanX, maxPanX));
     setPanY((y) => clamp(y, minPanY, maxPanY));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom, containerSize.width, containerSize.height]);
+
+  // Momentum animation loop
+  useEffect(() => {
+    if (isDragging || (Math.abs(velocity.x) < MIN_VELOCITY && Math.abs(velocity.y) < MIN_VELOCITY)) {
+      if (momentumRef.current) {
+        cancelAnimationFrame(momentumRef.current);
+        momentumRef.current = null;
+      }
+      return;
+    }
+
+    const animate = () => {
+      setVelocity(prev => ({
+        x: prev.x * FRICTION,
+        y: prev.y * FRICTION
+      }));
+
+      setPanX(prev => {
+        const { minPanX, maxPanX } = getPanBounds();
+        return clamp(prev + velocity.x, minPanX, maxPanX);
+      });
+      
+      setPanY(prev => {
+        const { minPanY, maxPanY } = getPanBounds();
+        return clamp(prev + velocity.y, minPanY, maxPanY);
+      });
+
+      if (Math.abs(velocity.x) >= MIN_VELOCITY || Math.abs(velocity.y) >= MIN_VELOCITY) {
+        momentumRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    momentumRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (momentumRef.current) {
+        cancelAnimationFrame(momentumRef.current);
+        momentumRef.current = null;
+      }
+    };
+  }, [velocity, isDragging]);
 
   // --- your existing effects (welcome + image cascade) stay as-is ---
   useEffect(() => {
@@ -182,16 +231,29 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   // --- drag handling with dynamic bounds ---
   const handleStart = (clientX: number, clientY: number) => {
+    // Stop any ongoing momentum
+    if (momentumRef.current) {
+      cancelAnimationFrame(momentumRef.current);
+      momentumRef.current = null;
+    }
+    setVelocity({ x: 0, y: 0 });
+    
     setIsDragging(true);
     setDragStart({ x: clientX, y: clientY });
     setPanStart({ x: panX, y: panY });
+    setLastMoveTime(Date.now());
+    setLastPosition({ x: clientX, y: clientY });
   };
 
   const handleMove = (clientX: number, clientY: number) => {
     if (!isDragging) return;
 
-    const deltaX = clientX - dragStart.x;
-    const deltaY = clientY - dragStart.y;
+    const now = Date.now();
+    const timeDelta = now - lastMoveTime;
+    
+    // Calculate amplified movement
+    const deltaX = (clientX - dragStart.x) * DRAG_AMPLIFICATION;
+    const deltaY = (clientY - dragStart.y) * DRAG_AMPLIFICATION;
 
     const newPanX = panStart.x + deltaX;
     const newPanY = panStart.y + deltaY;
@@ -200,9 +262,26 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
     setPanX(clamp(newPanX, minPanX, maxPanX));
     setPanY(clamp(newPanY, minPanY, maxPanY));
+    
+    // Track velocity for momentum (based on actual movement, not amplified)
+    if (timeDelta > 0) {
+      const actualDeltaX = clientX - lastPosition.x;
+      const actualDeltaY = clientY - lastPosition.y;
+      
+      setVelocity({
+        x: (actualDeltaX / timeDelta) * 16 * DRAG_AMPLIFICATION, // Convert to per-frame velocity
+        y: (actualDeltaY / timeDelta) * 16 * DRAG_AMPLIFICATION
+      });
+    }
+    
+    setLastMoveTime(now);
+    setLastPosition({ x: clientX, y: clientY });
   };
 
-  const handleEnd = () => setIsDragging(false);
+  const handleEnd = () => {
+    setIsDragging(false);
+    // Momentum will continue based on the last velocity
+  };
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
