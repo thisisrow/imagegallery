@@ -23,23 +23,24 @@ const images = [
   '/images/1-1.jpeg',
   '/images/1-1.jpeg',
 ];
-// Grid positions (unchanged)
-const getGridPositions = (size: number) => {
+// Grid positions with proper aspect ratio
+const getGridPositions = (width: number, height: number) => {
   const positions = [];
   const cols = 5;
   const rows = Math.ceil(images.length / cols);
-  const spacing = size + 20;
+  const spacingX = width + 10;
+  const spacingY = height + 10;
 
   for (let i = 0; i < images.length; i++) {
     const row = Math.floor(i / cols);
     const col = i % cols;
 
-    const startX = -((cols - 1) * spacing) / 2;
-    const startY = -((rows - 1) * spacing) / 2;
+    const startX = -((cols - 1) * spacingX) / 2;
+    const startY = -((rows - 1) * spacingY) / 2;
 
     positions.push({
-      x: startX + col * spacing,
-      y: startY + row * spacing,
+      x: startX + col * spacingX,
+      y: startY + row * spacingY,
     });
   }
 
@@ -78,8 +79,12 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const FRICTION = 0.92; // Momentum decay factor
   const MIN_VELOCITY = 0.5; // Stop momentum when velocity is below this
 
-  const imageSize = 200;
-  const positions = getGridPositions(imageSize);
+  // Calculate proper dimensions based on image aspect ratio
+  const imageWidth = 200;
+  const imageAspectRatio = 1060 / 1500; // height / width from your image specs
+  const imageHeight = imageWidth * imageAspectRatio; // ~141px
+  
+  const positions = getGridPositions(imageWidth, imageHeight);
 
   // --- container size (used to compute dynamic bounds) ---
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -110,11 +115,12 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const getGridSize = () => {
     const cols = 5;
     const rows = Math.ceil(images.length / cols);
-    const spacing = imageSize + 20;
+    const spacingX = imageWidth + 10;
+    const spacingY = imageHeight + 10;
 
     // total extents (centers + half tile each side)
-    const width = (cols - 1) * spacing + imageSize;
-    const height = (rows - 1) * spacing + imageSize;
+    const width = (cols - 1) * spacingX + imageWidth;
+    const height = (rows - 1) * spacingY + imageHeight;
     return { width, height };
   };
 
@@ -366,7 +372,8 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
               alt={`Image ${index + 1}`}
               x={position.x}
               y={position.y}
-              size={imageSize}
+              width={imageWidth}
+              height={imageHeight}
               delay={index * 100}
               isAnimating={!shouldAnimate}
             />
