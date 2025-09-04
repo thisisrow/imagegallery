@@ -31,7 +31,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
         left: `calc(50% + ${isAnimating ? 0 : x}px)`,
         top: `calc(50% + ${isAnimating ? 0 : y}px)`,
         width: `${size}px`,
-        height: `${size}px`,
+        height: `auto`,
         transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isAnimating ? 'scale(0) ' : 'scale(1) rotate(0deg)'}`,
         transitionDelay: isAnimating ? `${delay}ms` : '0ms',
         opacity: isLoaded ? 1 : 0,
