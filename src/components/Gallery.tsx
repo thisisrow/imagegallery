@@ -62,6 +62,7 @@ const getGridPositions = (containerWidth: number) => {
   const rows = Math.ceil(images.length / cols);
   const spacingX = imageWidth + getResponsiveSpace(containerWidth);
   const spacingY = imageHeight + getResponsiveSpace(containerWidth);
+  const staggerAmount = spacingX * 0.5; // Half spacing for brick pattern
 
   for (let i = 0; i < images.length; i++) {
     const row = Math.floor(i / cols);
@@ -70,8 +71,11 @@ const getGridPositions = (containerWidth: number) => {
     const startX = -((cols - 1) * spacingX) / 2;
     const startY = -((rows - 1) * spacingY) / 2;
 
+    // Add stagger offset for odd rows (brick pattern)
+    const staggerOffset = row % 2 === 1 ? staggerAmount : 0;
+
     positions.push({
-      x: startX + col * spacingX,
+      x: startX + col * spacingX + staggerOffset,
       y: startY + row * spacingY,
     });
   }
@@ -149,9 +153,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const rows = Math.ceil(images.length / cols);
     const spacingX = imageWidth + 10;
     const spacingY = imageHeight + 10;
+    const staggerAmount = spacingX * 0.5; // Same stagger amount as in getGridPositions
 
     // total extents (centers + half tile each side)
-    const width = (cols - 1) * spacingX + imageWidth;
+    const width = (cols - 1) * spacingX + imageWidth + (rows > 1 ? staggerAmount : 0);
     const height = (rows - 1) * spacingY + imageHeight;
     return { width, height };
   };
