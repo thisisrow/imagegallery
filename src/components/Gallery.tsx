@@ -37,6 +37,12 @@ const getResponsiveSpace = (containerWidth: number): number => {
   return 30; // Desktop
 };
 
+const getZoomSize = (containerWidth: number): number => {
+  if (containerWidth <= 768) return 1; // Mobile
+  if (containerWidth <= 1024) return 2; // Tablet
+  return 3; // Desktop
+};
+
 // Calculate responsive image width
 const getResponsiveImageWidth = (containerWidth: number, cols: number): number => {
   const minWidth = 120;
@@ -80,7 +86,7 @@ interface GalleryProps {
 export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
-  const [zoom, setZoom] = useState(2);
+  const [zoom, setZoom] = useState(getZoomSize(window.innerWidth));
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
