@@ -445,7 +445,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
             className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
             style={{ transform: `translate(${textPanX}px, ${textPanY}px)` }}
           >
-            <img src="/images/logo.webp"  />
+            <img src="/images/logo.webp" alt="logo" />
           </h1>
         </div>
       )}
