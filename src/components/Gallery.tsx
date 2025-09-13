@@ -48,6 +48,7 @@ const getResponsiveSpace = (containerWidth: number): number => {
 const getZoomSize = (containerWidth: number): number => {
   if (containerWidth <= 768) return 2; // Mobile
   if (containerWidth <= 1024) return 2; // Tablet
+  if (containerWidth <= 1280) return 2.5; // Desktop
   return 3; // Desktop
 };
 
