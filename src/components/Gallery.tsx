@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ImageItem } from './ImageItem';
+import { motion } from "framer-motion";
 
 const images = [
   '/images/1-1.jpeg',
@@ -441,12 +442,19 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       {/* Welcome text */}
       {welcomeVisible && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <h1
-            className={`text-8xl md:text-9xl font-bold text-black tracking-wider select-none transition-all`}
+ 
+           <motion.img
+            src="/images/logo.webp"
+            alt="logo"
+            className="w-[300px] md:w-[700px]"
             style={{ transform: `translate(${textPanX}px, ${textPanY}px)` }}
-          >
-            <img src="/images/logo.webp" alt="logo" />
-          </h1>
+            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+            animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+            transition={{
+              duration: 2, // slower = smoother reveal
+              ease: "easeInOut"
+            }}
+          />
         </div>
       )}
 
