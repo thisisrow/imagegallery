@@ -13,8 +13,8 @@ const images = [
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
 const getResponsiveColumns = (containerWidth: number): number => {
-  if (containerWidth <= 768) return 3;
-  if (containerWidth <= 1024) return 3;
+  if (containerWidth <= 768) return 4;
+  if (containerWidth <= 1024) return 4;
   return 5;
 };
 
@@ -96,11 +96,13 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     dist: 0,
   });
 
+
+
   /** tuning */
   const OVERSCROLL = 100;
-  const DRAG_MULT = 1.5;
-  const FRICTION = 0.985;
-  const MIN_VEL = 0.05;
+  const DRAG_MULT = 1.2;
+  const FRICTION = 0.97;
+  const MIN_VEL = 0.1;
   const STATE_EPS = 0.5; // do not re-render for < 0.5px
 
   const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
