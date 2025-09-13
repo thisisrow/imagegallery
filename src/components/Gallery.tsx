@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ImageItem } from './ImageItem';
 import { motion } from 'framer-motion';
 
@@ -345,7 +345,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const dir = e.deltaY > 0 ? 0.9 : 1.1;
     const next = clamp(zoomRef.current * dir, 1.3, 3);
 
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     const zPrev = zoomRef.current;
     zoomRef.current = next;
     setZoom(next);
