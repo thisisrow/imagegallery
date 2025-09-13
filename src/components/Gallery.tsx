@@ -23,12 +23,36 @@ const images = [
   '/images/1-1.jpeg',
   '/images/1-1.jpeg',
   '/images/1-1.jpeg',
+    '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+    '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
+  '/images/1-1.jpeg',
 ];
 // Calculate responsive columns based on container width
 const getResponsiveColumns = (containerWidth: number): number => {
   if (containerWidth <= 768) return 3; // Mobile
   if (containerWidth <= 1024) return 3; // Tablet
-  return 5; // Desktop
+  return 8; // Desktop
 };
 
 // Calculate responsive columns based on container width
@@ -117,8 +141,8 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const OVERSCROLL = 100;
   const DRAG_MULT = 1.5;
   const DRAG_AMPLIFICATION = 2.5; // Amplify user movement during dragging
-  const FRICTION = 0.92; // Momentum decay factor
-  const MIN_VELOCITY = 0.5; // Stop momentum when velocity is below this
+  const FRICTION = 0.98; // Momentum decay factor
+  const MIN_VELOCITY = 0.1; // Stop momentum when velocity is below this
 
   // Calculate responsive grid layout
   // --- container size (used to compute dynamic bounds) ---
