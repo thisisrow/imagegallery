@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ImageItemProps {
   src: string;
@@ -8,7 +8,6 @@ interface ImageItemProps {
   width: number;
   height: number;
   delay: number;
-  isAnimating: boolean;
 }
 
 export const ImageItem: React.FC<ImageItemProps> = ({ 
@@ -18,26 +17,37 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   y, 
   width,
   height,
-  delay,
-  isAnimating 
+  delay
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  // Start image animation after 1 second (when logo is halfway through)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000 + delay); // 1 second base delay + individual image delay
+
+    return () => clearTimeout(timer);
+  }, [delay]);
 
   return (
     <div
+      ref={itemRef}
       className={`
         absolute transition-all duration-1000 ease-out transform
       `}
       style={{
-        left: `calc(50% + ${isAnimating ? 0 : x}px)`,
-        top: `calc(50% + ${isAnimating ? 0 : y}px)`,
+        left: `calc(50% + ${x}px)`,
+        top: `calc(50% + ${y}px)`,
         width: `${width}px`,
         height: `${height}px`,
-        transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isAnimating ? 'scale(0) ' : 'scale(1) rotate(0deg)'}`,
-        transitionDelay: isAnimating ? `${delay}ms` : '0ms',
-        opacity: isLoaded ? 1 : 0,
-        zIndex: isHovered ? 10 : 1,
+        transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isVisible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0)'}`,
+        transitionDelay: isVisible ? '0ms' : '0ms',
+        opacity: isLoaded && isVisible ? 1 : 0,
+        zIndex: isHovered ? 10 : (isVisible ? 3 : -1), // Start behind logo, then come forward
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

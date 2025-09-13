@@ -102,7 +102,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
-  const [animatedImages, setAnimatedImages] = useState(0);
   const [welcomeVisible, setWelcomeVisible] = useState(false);
   
   // Momentum and velocity tracking
@@ -269,25 +268,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     );
   };
 
-  // --- your existing effects (welcome + image cascade) stay as-is ---
+  // Welcome animation effect
   useEffect(() => {
     if (isVisible) {
       setTimeout(() => setWelcomeVisible(true), 500);
-
-      const animationTimer = setTimeout(() => {
-        const interval = setInterval(() => {
-          setAnimatedImages((prev) => {
-            if (prev >= images.length) {
-              clearInterval(interval);
-              return prev;
-            }
-            return prev + 1;
-          });
-        }, 150);
-        return () => clearInterval(interval);
-      }, 2500);
-
-      return () => clearTimeout(animationTimer);
     }
   }, [isVisible]);
 
@@ -448,17 +432,17 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     >
       {/* Welcome text */}
       {welcomeVisible && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none ">
  
            <motion.img
             src="/images/logo.webp"
             alt="logo"
-            className="w-[300px] md:w-[700px]"
+            className="w-[300px] md:w-[700px] z-[1]"
             style={{ transform: `translate(${textPanX}px, ${textPanY}px)` }}
             initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
             animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
             transition={{
-              duration: 2, // slower = smoother reveal
+              duration: 2, // 2 second duration for logo
               ease: "easeInOut"
             }}
           />
@@ -475,7 +459,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       >
         {images.map((src, index) => {
           const position = positions[index] || { x: 0, y: 0 };
-          const shouldAnimate = index < animatedImages;
           return (
             <ImageItem
               key={index}
@@ -485,8 +468,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
               y={position.y}
               width={imageWidth}
               height={imageHeight}
-              delay={index * 100}
-              isAnimating={!shouldAnimate}
+              delay={index * 50}
             />
           );
         })}
