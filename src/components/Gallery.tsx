@@ -99,7 +99,14 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
 
   /** tuning */
-  const OVERSCROLL = 100;
+  // Dynamic overscroll based on grid dimensions
+  const getOverscroll = () => {
+    const { width: gridW, height: gridH, staggerAmount } = getGridSize();
+    // Use a percentage of the grid size plus some extra for stagger
+    const horizontalOverscroll = Math.max(100, gridW * 0.1 + staggerAmount);
+    const verticalOverscroll = Math.max(100, gridH * 0.1);
+    return { horizontal: horizontalOverscroll, vertical: verticalOverscroll };
+  };
   const DRAG_MULT = 1.2;
   const FRICTION = 0.97;
   const MIN_VEL = 0.1;
@@ -109,22 +116,33 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   const getGridSize = () => {
     const rows = Math.ceil(images.length / cols);
-    const spacingX = imageWidth + 10;
-    const spacingY = imageHeight + 10;
+    // Use the same spacing as getGridPositions
+    const spacingX = imageWidth + getResponsiveSpace(containerSize.width || 1200);
+    const spacingY = imageHeight + getResponsiveSpace(containerSize.width || 1200);
     const staggerAmount = spacingX * 0.5;
-    const width = (cols - 1) * spacingX + imageWidth + (rows > 1 ? staggerAmount : 0);
+   
+    // Calculate actual bounds including stagger
+    // The stagger affects the rightmost edge of odd rows
+    const baseWidth = (cols - 1) * spacingX + imageWidth;
+    const maxStaggerOffset = rows > 1 ? staggerAmount : 0;
+    const width = baseWidth + maxStaggerOffset;
+   
+    // Height calculation remains the same
     const height = (rows - 1) * spacingY + imageHeight;
-    return { width, height };
+   
+    return { width, height, staggerAmount };
   };
 
   const getPanBounds = (z = zoomRef.current) => {
     const { width: cw, height: ch } = containerSize;
+    const { horizontal: overscrollX, vertical: overscrollY } = getOverscroll();
+   
     if (!cw || !ch) {
       return {
-        minPanX: -OVERSCROLL / DRAG_MULT,
-        maxPanX: OVERSCROLL / DRAG_MULT,
-        minPanY: -OVERSCROLL / DRAG_MULT,
-        maxPanY: OVERSCROLL / DRAG_MULT,
+        minPanX: -overscrollX / DRAG_MULT,
+        maxPanX: overscrollX / DRAG_MULT,
+        minPanY: -overscrollY / DRAG_MULT,
+        maxPanY: overscrollY / DRAG_MULT,
       };
     }
 
@@ -132,18 +150,18 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const scaledW = gridW * z;
     const scaledH = gridH * z;
 
-    const rangeFor = (content: number, container: number) => {
+    const rangeFor = (content: number, container: number, overscroll: number) => {
       if (content >= container) {
         const half = (content - container) / 2;
-        return [-half - OVERSCROLL, half + OVERSCROLL];
+        return [-half - overscroll, half + overscroll];
       } else {
         const dead = (container - content) / 2;
-        return [-(dead + OVERSCROLL), dead + OVERSCROLL];
+        return [-(dead + overscroll), dead + overscroll];
       }
     };
 
-    const [minTX, maxTX] = rangeFor(scaledW, cw);
-    const [minTY, maxTY] = rangeFor(scaledH, ch);
+    const [minTX, maxTX] = rangeFor(scaledW, cw, overscrollX);
+    const [minTY, maxTY] = rangeFor(scaledH, ch, overscrollY);
 
     return {
       minPanX: minTX / DRAG_MULT,
@@ -435,3 +453,5 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     </div>
   );
 };
+
+
