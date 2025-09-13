@@ -35,7 +35,7 @@ const images = [
 const getResponsiveColumns = (containerWidth: number): number => {
   if (containerWidth <= 768) return 3; // Mobile
   if (containerWidth <= 1024) return 3; // Tablet
-  return 8; // Desktop
+  return 5; // Desktop
 };
 
 // Calculate responsive columns based on container width
