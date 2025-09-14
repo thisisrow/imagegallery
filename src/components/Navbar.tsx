@@ -40,9 +40,7 @@ export const Navbar = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-4 py-2 text-black font-serif text-sm transition-all duration-300 hover:underline ${
-                  isActive(item.path) ? 'underline' : ''
-                }`}
+                className={`relative px-4 py-2 text-black font-serif text-sm transition-all duration-300`}
               >
                 {item.name}
                 {isActive(item.path) && (
@@ -77,7 +75,9 @@ export const Navbar = () => {
           {/* Hamburger Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center"
+            className={`w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center ${
+              isMobileMenuOpen ? 'hidden' : 'block'
+            }`}
           >
             <div className="w-5 h-5 flex flex-col justify-center space-y-1">
               <span className={`block h-0.5 w-full bg-black transition-transform duration-300 ${
@@ -105,11 +105,11 @@ export const Navbar = () => {
             transition={{ duration: 0.35, ease: [0.215, 0.61, 0.355, 1] }}
           >
             {/* Blue Background Overlay */}
-            <div className="absolute inset-0 bg-blue-500 bg-opacity-20" />
+            <div className="absolute inset-0 " style={{background: "#212d8e",opacity: "0.9"}}/>
             
             {/* White Menu Card */}
             <motion.div
-              className="absolute top-20 left-4 right-4 bg-white rounded-lg shadow-xl p-8"
+              className="absolute top-15 left-4 right-4 bg-white rounded-lg shadow-xl p-8"
               style={{ height: '60vh' }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export const Navbar = () => {
               {/* Close Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-2xl font-light text-gray-600 hover:text-black transition-colors"
+                className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center text-2xl font-light text-gray-500 text-black transition-colors"
               >
                 ×
               </button>
@@ -128,23 +128,17 @@ export const Navbar = () => {
               <div className="flex flex-col space-y-6 mt-8">
                 {navItems.map((item) => (
                   <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`relative text-black font-serif text-lg transition-all duration-300 hover:underline ${
-                      isActive(item.path) ? 'underline' : ''
-                    }`}
-                  >
-                    {item.name}
-                    {isActive(item.path) && (
-                      <motion.div
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-black"
-                        layoutId="mobileActiveIndicator"
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
-                    )}
-                  </Link>
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`relative text-black font-serif text-lg transition-all duration-300 ${
+                    isActive(item.path)
+                      ? 'underline underline-offset-4 decoration-2' // active style
+                      : 'hover:underline underline-offset-4 decoration-2' // inactive style with hover
+                  }`}
+                >
+                  {item.name}
+                </Link>
                 ))}
               </div>
             </motion.div>

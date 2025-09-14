@@ -14,15 +14,18 @@ export const Info = () => {
           <img
             src="/images/logo-t.png"
             alt="STUDIO HOLMBERG ARKITEKTUR"
-            className=" h-15  w-auto object-contain"
+            className="h-15 w-auto object-contain"   // example: 60px height
             loading="eager"
+            style={{ filter: "drop-shadow(2px 4px 6px gold)" }}
           />
+
 
           </a>
 
           <a
             href="/"
-            className="text-xl font-medium underline-offset-4 hover:underline"
+            className="text-xl  underline-offset-4 hover:underline"
+            style={{ fontWeight: 600 }}
           >
             Home
           </a>
