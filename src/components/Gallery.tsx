@@ -97,8 +97,15 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   });
 
 
+  /** -------------------- TUNING -------------------- **/
+  const DRAG_MULT = 1.2;
+  const FRICTION = 0.97;
+  const MIN_VEL = 0.1;
+  const MAX_VEL = 80; // <<< --- NEW: Maximum velocity for flick inertia
+  const STATE_EPS = 0.5; // do not re-render for < 0.5px
 
-  /** tuning */
+  const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
   // Dynamic overscroll based on grid dimensions
   const getOverscroll = () => {
     const { width: gridW, height: gridH, staggerAmount } = getGridSize();
@@ -107,27 +114,17 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     const verticalOverscroll = Math.max(100, gridH * 0.1);
     return { horizontal: horizontalOverscroll, vertical: verticalOverscroll };
   };
-  const DRAG_MULT = 1.2;
-  const FRICTION = 0.97;
-  const MIN_VEL = 0.1;
-  const STATE_EPS = 0.5; // do not re-render for < 0.5px
-
-  const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-
+  
   const getGridSize = () => {
     const rows = Math.ceil(images.length / cols);
-    // Use the same spacing as getGridPositions
     const spacingX = imageWidth + getResponsiveSpace(containerSize.width || 1200);
     const spacingY = imageHeight + getResponsiveSpace(containerSize.width || 1200);
     const staggerAmount = spacingX * 0.5;
    
-    // Calculate actual bounds including stagger
-    // The stagger affects the rightmost edge of odd rows
     const baseWidth = (cols - 1) * spacingX + imageWidth;
     const maxStaggerOffset = rows > 1 ? staggerAmount : 0;
     const width = baseWidth + maxStaggerOffset;
    
-    // Height calculation remains the same
     const height = (rows - 1) * spacingY + imageHeight;
    
     return { width, height, staggerAmount };
@@ -182,11 +179,11 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
     let ro: ResizeObserver | null = null;
    if (typeof globalThis !== 'undefined' && 'ResizeObserver' in globalThis) {
-  ro = new ResizeObserver(update);
-  ro.observe(el);
-} else if (typeof globalThis !== 'undefined') {
-  globalThis.addEventListener('resize', update, { passive: true });
-}
+      ro = new ResizeObserver(update);
+      ro.observe(el);
+    } else if (typeof globalThis !== 'undefined') {
+      globalThis.addEventListener('resize', update, { passive: true });
+    }
 
     return () => {
       ro?.disconnect();
@@ -209,13 +206,11 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       lastFrameTimeRef.current = t;
 
       if (!isDraggingRef.current) {
-        // propose next position
         let nextX = panRef.current.x + velRef.current.x * dt;
         let nextY = panRef.current.y + velRef.current.y * dt;
 
         const { minPanX, maxPanX, minPanY, maxPanY } = getPanBounds();
 
-        // --- EDGE-AWARE: if inertia would push further out, clamp & zero that axis velocity ---
         if ((nextX <= minPanX && velRef.current.x < 0) || (nextX >= maxPanX && velRef.current.x > 0)) {
           nextX = clamp(nextX, minPanX, maxPanX);
           velRef.current.x = 0;
@@ -225,23 +220,18 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
           velRef.current.y = 0;
         }
 
-        // friction AFTER handling edges
         velRef.current.x *= FRICTION;
         velRef.current.y *= FRICTION;
 
-        // small deadzone to fully stop tiny jiggle
         if (Math.abs(velRef.current.x) < MIN_VEL) velRef.current.x = 0;
         if (Math.abs(velRef.current.y) < MIN_VEL) velRef.current.y = 0;
 
-        // final clamp
         const clampedX = clamp(nextX, minPanX, maxPanX);
         const clampedY = clamp(nextY, minPanY, maxPanY);
 
-        // assign to refs
         if (Math.abs(clampedX - panRef.current.x) > 1e-3) panRef.current.x = clampedX;
         if (Math.abs(clampedY - panRef.current.y) > 1e-3) panRef.current.y = clampedY;
 
-        // set state only if noticeable (prevents vibration-looking reflows)
         if (Math.abs(clampedX - panX) > STATE_EPS) setPanX(clampedX);
         if (Math.abs(clampedY - panY) > STATE_EPS) setPanY(clampedY);
       }
@@ -306,9 +296,16 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       if (Math.abs(nextX - panX) > STATE_EPS) setPanX(nextX);
       if (Math.abs(nextY - panY) > STATE_EPS) setPanY(nextY);
 
-      // velocity estimate for inertia
-      velRef.current.x = dx * 0.25;
-      velRef.current.y = dy * 0.25;
+      // --- MODIFIED SECTION: Limit velocity ---
+      // 1. Calculate the raw velocity from the drag distance
+      const velX = dx * 0.25;
+      const velY = dy * 0.25;
+
+      // 2. Clamp each velocity component to the MAX_VEL limit
+      velRef.current.x = clamp(velX, -MAX_VEL, MAX_VEL);
+      velRef.current.y = clamp(velY, -MAX_VEL, MAX_VEL);
+      // --- END MODIFIED SECTION ---
+
     } else if (count >= 2) {
       const startZoom = gestureStartRef.current.zoom;
       const startDist = gestureStartRef.current.dist || distance || 1;
@@ -318,11 +315,9 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       const zPrev = zoomRef.current;
       const zNext = newZoom;
 
-      // base translation from finger motion
       let baseX = gestureStartRef.current.pan.x + (center.x - gestureStartRef.current.center.x);
       let baseY = gestureStartRef.current.pan.y + (center.y - gestureStartRef.current.center.y);
 
-      // rescale to keep content under fingers stable
       let nextX = baseX * (zPrev / zNext);
       let nextY = baseY * (zPrev / zNext);
 
@@ -338,7 +333,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       if (Math.abs(nextX - panX) > STATE_EPS) setPanX(nextX);
       if (Math.abs(nextY - panY) > STATE_EPS) setPanY(nextY);
 
-      velRef.current = { x: 0, y: 0 }; // no inertia from pinch
+      velRef.current = { x: 0, y: 0 };
     }
   };
 
@@ -346,7 +341,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     pointersRef.current.delete(id);
     if (pointersRef.current.size === 0) {
       isDraggingRef.current = false;
-      // inertia continues with current velRef (now edge-aware)
     } else {
       const { center, distance } = computeGesture();
       gestureStartRef.current.center = center;
@@ -369,7 +363,6 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     zoomRef.current = next;
     setZoom(next);
 
-    // keep position stable-ish on wheel
     let nextPanX = panRef.current.x * (zPrev / next);
     let nextPanY = panRef.current.y * (zPrev / next);
 
@@ -402,7 +395,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
   return (
     <div
       ref={containerRef}
-      style={{ touchAction: 'none' }} // critical for smooth touch
+      style={{ touchAction: 'none' }}
       className="w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing relative"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -453,5 +446,3 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     </div>
   );
 };
-
-
