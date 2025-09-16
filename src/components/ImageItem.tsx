@@ -36,10 +36,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   return (
     <div
   ref={itemRef}
-  className={`
-    absolute transform transition-all duration-3000 ease-out
-    ${isLoaded && isVisible ? "opacity-100" : "opacity-0"}
-  `}
+  className={`absolute transform transition-all duration-3000 ease-out`}
   style={{
     left: `calc(50% + ${x}px)`,
     top: `calc(50% + ${y}px)`,
