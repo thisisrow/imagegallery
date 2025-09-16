@@ -37,7 +37,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
     <div
   ref={itemRef}
   className={`
-    absolute transform transition-all duration-3000 ease-linear
+    absolute transform transition-all duration-3000 ease-out
     ${isLoaded && isVisible ? "opacity-100" : "opacity-0"}
   `}
   style={{
