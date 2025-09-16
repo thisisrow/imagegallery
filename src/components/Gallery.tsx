@@ -409,7 +409,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
           <motion.img
             src="/images/logo.webp"
             alt="logo"
-            className="w-[400px] md:w-[800px] z-[1] m-2"
+            className="w-[300px] md:w-[800px] z-[1] m-2"
             style={{ transform: `translate(${panX * 0.5}px, ${panY * 0.5}px)` }}
             initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
             animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }}
