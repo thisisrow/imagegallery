@@ -396,7 +396,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     <div
       ref={containerRef}
       style={{ touchAction: 'none' }}
-      className="w-full h-screen overflow-hidden cursor-grab active:cursor-grabbing relative"
+      className="w-full h-dvh overflow-hidden cursor-grab active:cursor-grabbing relative"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
