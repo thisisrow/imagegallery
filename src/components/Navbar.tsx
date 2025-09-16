@@ -26,11 +26,12 @@ export const Navbar = () => {
       <nav className="hidden md:flex fixed top-0 left-0 right-0 z-20 px-6 py-4">
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0  ">
             <img 
-              src="/images/logo.webp" 
+              src="/images/logo-t.png" 
               alt="Company Logo" 
-              className="h-18 w-auto"
+              className="h-12 w-auto "
+              style={{ filter: "drop-shadow(2px 4px 6px gold)" }}
             />
           </Link>
 
