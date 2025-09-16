@@ -41,13 +41,13 @@ export const Contact: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <div className="space-y-2">
-            <p className="text-2xl">Mathias Holmberg</p>
+            <p className="text-2xl">Ar. Dhanvay Mhatre</p>
 
             <a
               href="mailto:mathias@studioholmberg.se"
               className="underline underline-offset-4 hover:text-black "
             >
-              mathias@studioholmberg.se
+              hello@dhanvayymhatre.com
             </a>
 
             <div className="mt-2">
@@ -55,18 +55,18 @@ export const Contact: React.FC = () => {
                 href="tel:+460702171701"
                 className="underline underline-offset-4 hover:text-black"
               >
-                +46 (0) 702 171701
+                +91 97659 44222
               </a>
             </div>
           </div>
 
           <div className="space-y-1 text-gray-700">
-            <p>Manufakturgatan 4</p>
-            <p>41707</p>
-            <p>Göteborg</p>
+            <p>Shop no. 4, Ground Floor, Building No.5 Behind Philia Hospital,</p>
+            <p>Ramkrushna Garden, Tembhode Rd,</p>
+            <p>Palghar, Maharashtra 401404</p>
           </div>
 
-          <p className="text-gray-700">Arkitektur Foto: Markus Bülow</p>
+          <p className="text-gray-700">Ar. Dhanvay Mhatre : Architect </p>
         </motion.div>
       </div>
 
