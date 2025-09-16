@@ -35,7 +35,7 @@ export const Contact: React.FC = () => {
       {/* Centered contact info */}
       <div className="flex h-full items-center justify-center px-6">
         <motion.div
-          className="max-w-md text-center space-y-10 leading-relaxed"
+          className="max-w-lg text-center space-y-10 leading-relaxed"
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
