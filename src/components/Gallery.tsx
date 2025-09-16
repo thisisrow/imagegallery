@@ -12,7 +12,7 @@ const images = [
 ];
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
-const getResponsiveColumns = (containerWidth: number): number => {
+const getResponsiveColumns = (): number => {
   // if (containerWidth <= 768) return 4;
   // if (containerWidth <= 1024) return 4;
   return 4;
@@ -39,7 +39,7 @@ const getResponsiveImageWidth = (containerWidth: number, cols: number): number =
 };
 
 const getGridPositions = (containerWidth: number) => {
-  const cols = getResponsiveColumns(containerWidth);
+  const cols = getResponsiveColumns();
   const imageWidth = getResponsiveImageWidth(containerWidth, cols);
   const imageAspectRatio = 1060 / 1500;
   const imageHeight = imageWidth * imageAspectRatio;
