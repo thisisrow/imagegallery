@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 export const Contact: React.FC = () => {
   return (
     <motion.section
-      className="relative h-screen bg-gray-50 text-gray-800"
+      className="relative h-dvh bg-gray-50 text-gray-800"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.45 }}

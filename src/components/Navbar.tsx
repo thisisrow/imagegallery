@@ -30,7 +30,7 @@ export const Navbar = () => {
             <img 
               src="/images/logo.webp" 
               alt="Company Logo" 
-              className="h-8 w-auto"
+              className="h-18 w-auto"
             />
           </Link>
 

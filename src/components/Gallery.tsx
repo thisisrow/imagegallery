@@ -413,7 +413,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
             style={{ transform: `translate(${panX * 0.5}px, ${panY * 0.5}px)` }}
             initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
             animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }}
-            transition={{ duration: 2, ease: 'easeInOut' }}
+            transition={{ duration: 3, ease: 'easeInOut' }}
           />
         </div>
       )}
