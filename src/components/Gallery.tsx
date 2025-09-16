@@ -99,10 +99,10 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   /** -------------------- TUNING -------------------- **/
   const DRAG_MULT = 1.2;
-  const FRICTION = 0.97;
-  const MIN_VEL = 0.1;
-  const MAX_VEL = 40; // <<< --- NEW: Maximum velocity for flick inertia
-  const STATE_EPS = 0.5; // do not re-render for < 0.5px
+  const FRICTION = 0.95;
+  const MIN_VEL = 0.5;
+  const MAX_VEL = 30; // <<< --- NEW: Maximum velocity for flick inertia
+  const STATE_EPS = 0.9; // do not re-render for < 0.5px
 
   const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 

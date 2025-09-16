@@ -41,6 +41,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
     left: `calc(50% + ${x}px)`,
     top: `calc(50% + ${y}px)`,
     width: `${width}px`,
+    opacity: isLoaded && isVisible ? 1 : 0,
     height: `${height}px`,
     transform: `translate(-50%, -50%) 
                 ${isHovered ? "scale(1.05)" : "scale(1)"}
