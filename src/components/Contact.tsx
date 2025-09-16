@@ -44,7 +44,7 @@ export const Contact: React.FC = () => {
             <p className="text-2xl">Ar. Dhanvay Mhatre</p>
 
             <a
-              href="mailto:mathias@studioholmberg.se"
+              href="mailto: hello@dhanvayymhatre.com"
               className="underline underline-offset-4 hover:text-black "
             >
               hello@dhanvayymhatre.com
@@ -52,7 +52,7 @@ export const Contact: React.FC = () => {
 
             <div className="mt-2">
               <a
-                href="tel:+460702171701"
+                href="tel:+919765944222"
                 className="underline underline-offset-4 hover:text-black"
               >
                 +91 97659 44222
