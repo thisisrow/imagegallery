@@ -66,7 +66,7 @@ export const Contact: React.FC = () => {
             <p>Palghar, Maharashtra 401404</p>
           </div>
 
-          <p className="text-gray-700">Ar. Dhanvay Mhatre : Architect </p>
+          <p className="text-gray-700">Ar. Dhanvay Mhatre : Architect | CG Artist | Entrepreneur | Building DMS</p>
         </motion.div>
       </div>
 
