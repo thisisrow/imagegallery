@@ -13,9 +13,9 @@ const images = [
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
 const getResponsiveColumns = (containerWidth: number): number => {
-  if (containerWidth <= 768) return 4;
-  if (containerWidth <= 1024) return 4;
-  return 5;
+  // if (containerWidth <= 768) return 4;
+  // if (containerWidth <= 1024) return 4;
+  return 4;
 };
 
 const getResponsiveSpace = (containerWidth: number): number => {

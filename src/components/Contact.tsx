@@ -20,8 +20,6 @@ export const Contact: React.FC = () => {
             loading="eager"
             style={{ filter: "drop-shadow(2px 4px 6px gold)" }}
           />
-
-
           </a>
 
           <a
