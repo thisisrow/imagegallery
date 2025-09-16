@@ -35,23 +35,24 @@ export const ImageItem: React.FC<ImageItemProps> = ({
 
   return (
     <div
-      ref={itemRef}
-      className={`
-        absolute transition-all duration-1000 ease-out transform
-      `}
-      style={{
-        left: `calc(50% + ${x}px)`,
-        top: `calc(50% + ${y}px)`,
-        width: `${width}px`,
-        height: `${height}px`,
-        transform: `translate(-50%, -50%) ${isHovered ? 'scale(1.05)' : 'scale(1)'} ${isVisible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0)'}`,
-        transitionDelay: isVisible ? '0ms' : '0ms',
-        opacity: isLoaded && isVisible ? 1 : 0,
-        zIndex: isHovered ? 10 : (isVisible ? 3 : -1), // Start behind logo, then come forward
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+  ref={itemRef}
+  className={`
+    absolute transform transition-all duration-3000 ease-fast-slow
+    ${isLoaded && isVisible ? "opacity-100" : "opacity-0"}
+  `}
+  style={{
+    left: `calc(50% + ${x}px)`,
+    top: `calc(50% + ${y}px)`,
+    width: `${width}px`,
+    height: `${height}px`,
+    transform: `translate(-50%, -50%) 
+                ${isHovered ? "scale(1.05)" : "scale(1)"}
+                ${isVisible ? "translateY(0)" : "translateY(20px) scale(0)"}`,
+    zIndex: isHovered ? 10 : (isVisible ? 3 : -1),
+  }}
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+>
       <div className={`
         w-full h-full  overflow-hidden shadow-2xl transition-all duration-300 backdrop-blur-sm
         ${isHovered ? 'shadow-purple-500/30 shadow-3xl' : 'shadow-xl'}
