@@ -11,17 +11,7 @@ export const Contact: React.FC = () => {
     >
       {/* Top bar: logo (left) + Home (right) */}
       <header className="absolute inset-x-0 top-0 mt-4">
-        <div className="mx-auto flex h-30 max-w-6xl items-baseline justify-between px-6">
-          <a href="/" aria-label="Home" className="flex items-center">
-          <img
-            src="/images/logo-t.png"
-            alt="STUDIO HOLMBERG ARKITEKTUR"
-            className="h-15 w-auto object-contain"   // example: 60px height
-            loading="eager"
-            style={{ filter: "drop-shadow(2px 4px 6px gold)" }}
-          />
-          </a>
-
+        <div className="mx-auto flex h-auto max-w-6xl items-baseline justify-end px-6">
           <a
             href="/"
             className="text-xl  underline-offset-4 hover:underline"

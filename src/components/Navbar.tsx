@@ -24,17 +24,7 @@ export const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <nav className="hidden md:flex fixed top-0 left-0 right-0 z-20 px-6 py-4">
-        <div className="flex items-center justify-between w-full">
-          {/* Logo */}
-          <Link to="/" className="flex-shrink-0  ">
-            <img 
-              src="/images/logo-t.png" 
-              alt="Company Logo" 
-              className="h-12 w-auto "
-              style={{ filter: "drop-shadow(2px 4px 6px gold)" }}
-            />
-          </Link>
-
+        <div className="flex items-center justify-center w-full">
           {/* Center Navigation */}
           <div className="flex items-center bg-white rounded-full px-8 py-3 shadow-lg">
             {navItems.map((item) => (
@@ -63,15 +53,7 @@ export const Navbar = () => {
 
       {/* Mobile Navbar */}
       <nav className="md:hidden fixed top-0 left-0 right-0 z-20 px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
-            <img 
-              src="/images/logo.webp" 
-              alt="Company Logo" 
-              className="h-8 w-auto"
-            />
-          </Link>
+        <div className="flex items-center justify-end">
 
           {/* Hamburger Button */}
           <button
@@ -106,7 +88,7 @@ export const Navbar = () => {
             transition={{ duration: 0.35, ease: [0.215, 0.61, 0.355, 1] }}
           >
             {/* Blue Background Overlay */}
-            <div className="absolute inset-0 " style={{background: "#212d8e",opacity: "0.9"}}/>
+            <div className="absolute inset-0 " style={{ background: "transparent", opacity: 0.9 }}/>
             
             {/* White Menu Card */}
             <motion.div
