@@ -21,32 +21,38 @@ export const Navbar = () => {
       <nav className="hidden md:flex fixed top-0 left-0 right-0 z-20 px-6 py-4">
         <div className="flex items-center justify-center w-full">
           <div className="flex items-center bg-white rounded-full px-8 py-3 shadow-lg">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="relative px-4 py-2 text-black font-serif text-sm transition-all duration-300"
-              >
-                {item.name}
-                {isActive(item.path) && (
-                  <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-black"
-                    layoutId="activeIndicator"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                )}
-                <span
-                      className={`absolute left-0 bottom-0 h-[3px]  transition-transform duration-300 ${
-                        isActive(item.path)
-                          ? "w-full scale-x-100"
-                          : "w-full scale-x-0 group-hover:scale-x-100"
-                      }`}
-                      style={{background:"#b9a171"}}
-                    />
-              </Link>
-              
-            ))}
+            {navItems.map((item) => {
+  const active = isActive(item.path);
+
+  return (
+    <Link
+      key={item.path}
+      to={item.path}
+      className="relative px-4 py-2 text-black font-serif text-sm transition-all duration-300 group"
+    >
+      {item.name}
+
+      {/* Active underline (only show if active AND not hovering) */}
+      {active && (
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-0.5 group-hover:opacity-0"
+          style={{ background: "#b9a171" }}
+          layoutId="activeIndicator"
+          initial={false}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      )}
+
+      {/* Hover underline (shows on hover, even if active) */}
+      <span
+        className="absolute left-0 bottom-0 h-[3px] w-full scale-x-0 origin-right transition-transform duration-300 group-hover:scale-x-100 group-hover:origin-left"
+        style={{ background: "#b9a171" }}
+      />
+    </Link>
+  );
+})}
+
+
           </div>
           <div className="w-8"></div>
         </div>
