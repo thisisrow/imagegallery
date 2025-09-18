@@ -28,7 +28,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 2000 + delay); // 1 second base delay + individual image delay
+    }, 3000 + delay); // 1 second base delay + individual image delay
 
     return () => clearTimeout(timer);
   }, [delay]);
