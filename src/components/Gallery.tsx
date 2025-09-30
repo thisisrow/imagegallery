@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 
 /** -------------------- DATA -------------------- **/
 const images = [
-  '/images/1.jpg','/images/2.jpg','/images/3.jpg','/images/4.jpg','/images/5.jpg','/images/6.jpg',
-  '/images/7.jpg','/images/8.jpg','/images/9.jpg','/images/10.jpg','/images/11.jpg','/images/12.jpg',
-  '/images/13.jpg','/images/14.jpg','/images/15.jpg','/images/16.jpg','/images/17.jpg','/images/18.jpg',
-  '/images/19.jpg','/images/20.jpg','/images/21.jpg','/images/22.jpg','/images/23.jpg','/images/24.jpg',
-  '/images/25.jpg','/images/26.jpg'
+  '/img/1.webp','/img/2.webp','/img/3.webp','/img/4.webp','/img/5.webp','/img/6.webp',
+  '/img/7.webp','/img/8.webp','/img/9.webp','/img/10.webp','/img/11.webp','/img/12.webp',
+  '/img/13.webp','/img/14.webp','/img/15.webp','/img/16.webp','/img/17.webp','/img/18.webp',
+  '/img/19.webp','/img/20.webp','/img/21.webp','/img/22.webp','/img/23.webp','/img/24.webp',
+  '/img/25.webp','/img/26.webp'
 ];
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
