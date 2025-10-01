@@ -52,9 +52,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({
   onMouseLeave={() => setIsHovered(false)}
 >
       <div className={`
-        w-full h-full  overflow-hidden shadow-2xl transition-all duration-300 backdrop-blur-sm
-        ${isHovered ? 'shadow-purple-500/30 shadow-3xl' : 'shadow-xl'}
-        ring-1 ring-white/20 bg-white/5
+        w-full h-full  overflow-hidden  transition-all duration-300 
       `}>
         <img
           src={src}
@@ -69,10 +67,9 @@ export const ImageItem: React.FC<ImageItemProps> = ({
           onLoad={() => setIsLoaded(true)}
           draggable={false}
         />
-        
         {/* Subtle overlay for depth */}
         <div className={`
-          absolute inset-0 bg-gradient-to-t from-black/10 to-transparent
+          absolute inset-0 
         `} />
       </div>
     </div>

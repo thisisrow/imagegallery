@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ImageItem } from './ImageItem';
 import { motion } from 'framer-motion';
 
@@ -9,7 +9,7 @@ const images = [
   '/img/13.webp','/img/14.webp','/img/15.webp','/img/16.webp','/img/17.webp','/img/18.webp',
   '/img/19.webp','/img/20.webp','/img/21.webp','/img/22.webp','/img/23.webp','/img/24.webp',
   '/img/25.webp','/img/26.webp','/img/27.webp','/img/28.webp','/img/29.webp','/img/30.webp',
-  '/img/31.webp','/img/32.webp','/img/33.webp','/img/34.webp',
+  '/imgg/31.webp','/img/32.webp','/img/33.webp','/img/34.webp',
 ];
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
@@ -34,27 +34,40 @@ const getResponsiveImageWidth = (containerWidth: number, cols: number): number =
 
 const getGridPositions = (containerWidth: number) => {
   const cols = getResponsiveColumns();
-  const imageWidth = getResponsiveImageWidth(containerWidth, cols);
-  const imageAspectRatio = 1/ 2;
-  const imageHeight = imageWidth * imageAspectRatio;
+  const imageHeight = getResponsiveImageWidth(containerWidth, cols) / 2;
+
+  const imageDimensions = images.map(src => {
+    const imageNumber = parseInt(src.split('/').pop()?.split('.')[0] || '0');
+    const isEven = imageNumber % 2 === 0;
+    const aspectRatio = isEven ? 2 : 1;
+    return {
+      width: imageHeight * aspectRatio,
+      height: imageHeight,
+    };
+  });
 
   const positions: { x: number; y: number }[] = [];
   const rows = Math.ceil(images.length / cols);
-  const spacingX = imageWidth + 30; // Replaced getResponsiveSpace
-  const spacingY = imageHeight + 30; // Replaced getResponsiveSpace
+  const spacingY = imageHeight + 30;
+  const startY = -((rows - 1) * spacingY) / 2;
 
-  for (let i = 0; i < images.length; i++) {
-    const row = Math.floor(i / cols);
-    const col = i % cols;
-    const startX = -((cols - 1) * spacingX) / 2;
-    const startY = -((rows - 1) * spacingY) / 2;
-    positions.push({
-      x: startX + col * spacingX,
-      y: startY + row * spacingY,
+  for (let i = 0; i < rows; i++) {
+    const rowIndices = Array.from({ length: cols }, (_, k) => i * cols + k).filter(idx => idx < images.length);
+    const rowDims = rowIndices.map(index => imageDimensions[index]);
+    const rowWidth = rowDims.reduce((acc, dim) => acc + dim.width, 0) + (rowDims.length - 1) * 30;
+    let currentX = -rowWidth / 2;
+
+    rowIndices.forEach((index, j) => {
+      const dim = rowDims[j];
+      positions[index] = {
+        x: currentX + dim.width / 2,
+        y: startY + i * spacingY,
+      };
+      currentX += dim.width + 30;
     });
   }
 
-  return { positions, imageWidth, imageHeight, cols };
+  return { positions, imageDimensions, imageHeight, cols };
 };
 
 /** -------------------- TYPES -------------------- **/
@@ -77,7 +90,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const { positions, imageWidth, imageHeight, cols } = getGridPositions(containerSize.width || 1200);
+  const { positions, imageDimensions, imageHeight, cols } = useMemo(() => getGridPositions(containerSize.width || 1200), [containerSize.width]);
 
   type PointerState = { id: number; x: number; y: number };
   const pointersRef = useRef<Map<number, PointerState>>(new Map());
@@ -100,14 +113,24 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   const getGridSize = () => {
     const rows = Math.ceil(images.length / cols);
-    const spacingX = imageWidth + 30;
     const spacingY = imageHeight + 30;
-   
-    const width = (cols - 1) * spacingX + imageWidth;
-   
     const height = (rows - 1) * spacingY + imageHeight;
-   
-    return { width, height };
+
+    let maxWidth = 0;
+    if (imageDimensions.length > 0) {
+      for (let i = 0; i < rows; i++) {
+        const rowIndices = Array.from({ length: cols }, (_, k) => i * cols + k).filter(idx => idx < images.length);
+        const rowDims = rowIndices.map(index => imageDimensions[index]);
+        if (rowDims.length > 0) {
+          const rowWidth = rowDims.reduce((acc, dim) => acc + dim.width, 0) + (rowDims.length - 1) * 30;
+          if (rowWidth > maxWidth) {
+            maxWidth = rowWidth;
+          }
+        }
+      }
+    }
+
+    return { width: maxWidth, height };
   };
 
   const getPanBounds = (z = zoomRef.current) => {
@@ -369,7 +392,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
     setPanX(clampedX);
     setPanY(clampedY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerSize.width, containerSize.height, cols, imageWidth, imageHeight]);
+  }, [containerSize.width, containerSize.height, cols, imageHeight]);
 
   if (!isVisible) return null;
 
@@ -411,6 +434,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       >
         {images.map((src, index) => {
           const position = positions[index] || { x: 0, y: 0 };
+          const dims = imageDimensions[index] || { width: 0, height: 0 };
           return (
             <ImageItem
               key={index}
@@ -418,8 +442,8 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
               alt={`Image ${index + 1}`}
               x={position.x}
               y={position.y}
-              width={imageWidth}
-              height={imageHeight}
+              width={dims.width}
+              height={dims.height}
               delay={index * 50}
             />
           );
