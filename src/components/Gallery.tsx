@@ -15,14 +15,7 @@ const images = [
 /** -------------------- LAYOUT HELPERS -------------------- **/
 const getResponsiveColumns = (): number => {
   // if (containerWidth <= 768) return 4;
-  // if (containerWidth <= 1024) return 4;
-  return 4;
-};
-
-const getResponsiveSpace = (containerWidth: number): number => {
-  if (containerWidth <= 768) return 20;
-  if (containerWidth <= 1024) return 30;
-  return 30;
+  return 5;
 };
 
 const getZoomSize = (containerWidth: number): number => {
@@ -42,23 +35,21 @@ const getResponsiveImageWidth = (containerWidth: number, cols: number): number =
 const getGridPositions = (containerWidth: number) => {
   const cols = getResponsiveColumns();
   const imageWidth = getResponsiveImageWidth(containerWidth, cols);
-  const imageAspectRatio = 1060 / 1500;
+  const imageAspectRatio = 1/ 2;
   const imageHeight = imageWidth * imageAspectRatio;
 
   const positions: { x: number; y: number }[] = [];
   const rows = Math.ceil(images.length / cols);
-  const spacingX = imageWidth + getResponsiveSpace(containerWidth);
-  const spacingY = imageHeight + getResponsiveSpace(containerWidth);
-  const staggerAmount = spacingX * 0.5;
+  const spacingX = imageWidth + 30; // Replaced getResponsiveSpace
+  const spacingY = imageHeight + 30; // Replaced getResponsiveSpace
 
   for (let i = 0; i < images.length; i++) {
     const row = Math.floor(i / cols);
     const col = i % cols;
     const startX = -((cols - 1) * spacingX) / 2;
     const startY = -((rows - 1) * spacingY) / 2;
-    const staggerOffset = row % 2 === 1 ? staggerAmount : 0;
     positions.push({
-      x: startX + col * spacingX + staggerOffset,
+      x: startX + col * spacingX,
       y: startY + row * spacingY,
     });
   }
@@ -107,33 +98,22 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
 
   const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
-  // Dynamic overscroll based on grid dimensions
-  const getOverscroll = () => {
-    const { width: gridW, height: gridH, staggerAmount } = getGridSize();
-    // Use a percentage of the grid size plus some extra for stagger
-    const horizontalOverscroll = Math.max(100, gridW * 0.1 + staggerAmount);
-    const verticalOverscroll = Math.max(100, gridH * 0.1);
-    return { horizontal: horizontalOverscroll, vertical: verticalOverscroll };
-  };
-  
   const getGridSize = () => {
     const rows = Math.ceil(images.length / cols);
-    const spacingX = imageWidth + getResponsiveSpace(containerSize.width || 1200);
-    const spacingY = imageHeight + getResponsiveSpace(containerSize.width || 1200);
-    const staggerAmount = spacingX * 0.5;
+    const spacingX = imageWidth + 30;
+    const spacingY = imageHeight + 30;
    
-    const baseWidth = (cols - 1) * spacingX + imageWidth;
-    const maxStaggerOffset = rows > 1 ? staggerAmount : 0;
-    const width = baseWidth + maxStaggerOffset;
+    const width = (cols - 1) * spacingX + imageWidth;
    
     const height = (rows - 1) * spacingY + imageHeight;
    
-    return { width, height, staggerAmount };
+    return { width, height };
   };
 
   const getPanBounds = (z = zoomRef.current) => {
     const { width: cw, height: ch } = containerSize;
-    const { horizontal: overscrollX, vertical: overscrollY } = getOverscroll();
+    const overscrollX = 100;
+    const overscrollY = 100;
    
     if (!cw || !ch) {
       return {
