@@ -8,7 +8,8 @@ const images = [
   '/img/7.webp','/img/8.webp','/img/9.webp','/img/10.webp','/img/11.webp','/img/12.webp',
   '/img/13.webp','/img/14.webp','/img/15.webp','/img/16.webp','/img/17.webp','/img/18.webp',
   '/img/19.webp','/img/20.webp','/img/21.webp','/img/22.webp','/img/23.webp','/img/24.webp',
-  '/img/25.webp','/img/26.webp'
+  '/img/25.webp','/img/26.webp','/img/27.webp','/img/28.webp','/img/29.webp','/img/30.webp',
+  '/img/31.webp','/img/32.webp','/img/33.webp','/img/34.webp',
 ];
 
 /** -------------------- LAYOUT HELPERS -------------------- **/
