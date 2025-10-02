@@ -1,9 +1,10 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion} from "framer-motion";
+// import { motion, AnimatePresence } from "framer-motion";
 
 export const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
