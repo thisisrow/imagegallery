@@ -411,7 +411,7 @@ export const Gallery: React.FC<GalleryProps> = ({ isVisible }) => {
       {welcomeVisible && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <motion.img
-            src="/images/logo.webp"
+            src="/img/logo.webp"
             alt="logo"
             className="w-[300px] md:w-[800px] z-[1] m-2"
             style={{ transform: `translate(${panX * 0.5}px, ${panY * 0.5}px)` }}
