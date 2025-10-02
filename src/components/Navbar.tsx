@@ -8,12 +8,14 @@ export const Navbar = () => {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    // { name: "About", path: "/about" },
+    { name: "Info", path: "/contact" },
   ];
 
   const isActive = (path: string) =>
-    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
+    path === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(path);
 
   return (
     <>
@@ -22,37 +24,39 @@ export const Navbar = () => {
         <div className="flex items-center justify-center w-full">
           <div className="flex items-center bg-white rounded-full px-8 py-3 shadow-lg">
             {navItems.map((item) => {
-  const active = isActive(item.path);
+              const active = isActive(item.path);
 
-  return (
-    <Link
-      key={item.path}
-      to={item.path}
-      className="relative px-4 py-2 text-black font-serif text-sm transition-all duration-300 group"
-    >
-      {item.name}
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="relative px-4 py-2 text-black font-serif text-sm transition-all duration-300 group"
+                >
+                  {item.name}
 
-      {/* Active underline (only show if active AND not hovering) */}
-      {active && (
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-0.5 group-hover:opacity-0"
-          style={{ background: "#b9a171" }}
-          layoutId="activeIndicator"
-          initial={false}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        />
-      )}
+                  {/* Active underline (only show if active AND not hovering) */}
+                  {active && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 group-hover:opacity-0"
+                      style={{ background: "#b9a171" }}
+                      layoutId="activeIndicator"
+                      initial={false}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    />
+                  )}
 
-      {/* Hover underline (shows on hover, even if active) */}
-      <span
-        className="absolute left-0 bottom-0 h-[3px] w-full scale-x-0 origin-right transition-transform duration-300 group-hover:scale-x-100 group-hover:origin-left"
-        style={{ background: "#b9a171" }}
-      />
-    </Link>
-  );
-})}
-
-
+                  {/* Hover underline (shows on hover, even if active) */}
+                  <span
+                    className="absolute left-0 bottom-0 h-[3px] w-full scale-x-0 origin-right transition-transform duration-300 group-hover:scale-x-100 group-hover:origin-left"
+                    style={{ background: "#b9a171" }}
+                  />
+                </Link>
+              );
+            })}
           </div>
           <div className="w-8"></div>
         </div>
@@ -60,7 +64,14 @@ export const Navbar = () => {
 
       {/* Mobile Navbar (hamburger) */}
       <div className="md:hidden fixed top-4 right-4 z-50">
-        <button
+        <a
+          href="/contact"
+          className="text-xl  underline-offset-4 hover:underline bg-white rounded-md shadow p-2 underline"
+          style={{ fontWeight: 600 }}
+        >
+          Info
+        </a>
+        {/* <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="w-10 h-10 p-2 flex flex-col justify-between items-center bg-white rounded-md shadow"
         >
@@ -82,11 +93,11 @@ export const Navbar = () => {
             animate={isMobileMenuOpen ? { rotate: -45, y: -10 } : { rotate: 0, y: 0 }}
             transition={{ duration: 0.3 }}
           />
-        </button>
+        </button> */}
       </div>
 
       {/* Mobile Menu Overlay */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             key="overlay"
@@ -127,7 +138,6 @@ export const Navbar = () => {
                     }`}
                   >
                     {item.name}
-                    {/* underline */}
                     <span
                       className={`absolute left-0 bottom-0 h-[4px]  transition-transform duration-300 ${
                         isActive(item.path)
@@ -142,7 +152,7 @@ export const Navbar = () => {
             </motion.ul>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </>
   );
 };
